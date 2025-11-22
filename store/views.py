@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.pagination import PageNumberPagination
 from .models import Product, Collection, OrderItem, Review
 from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
 from .filters import ProductFilter
@@ -70,11 +69,6 @@ class ReviewViewSet(ModelViewSet):
 #             return Response({'error': 'Collection cannot be deleted since it is associated with more than one prdoucts'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 #         collection.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-
-
 
 # @api_view(['GET', 'POST'])
 # def product_list(request):
