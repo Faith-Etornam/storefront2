@@ -4,7 +4,7 @@ from .models import Collection, Product, Review, Cart, CartItem
 
 class CollectionSerializer(serializers.ModelSerializer):
     products_count = serializers.IntegerField(read_only=True)
-    class Meta:
+    class Meta: 
         model = Collection
         fields = ['id', 'title', 'products_count']
 
@@ -50,6 +50,28 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ['id', 'items', 'total_price']
 
 class AddCartItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField()
+
+    def validate_product_id(self, value):
+        if not Product.objects.filter(pk=value).exists():
+            raise serializers.ValidationError('No product with the given product_id was found')
+        return value
+
+    def save(self, **kwargs):
+        cart_id = self.context['cart_id']
+        product_id = self.validated_data.get('product_id')
+        quantity = self.validated_data.get('quantity')
+        try:
+            cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product_id)
+            cart_item.quantity += quantity
+            cart_item.save()
+            self.instance = cart_item
+
+        except CartItem.DoesNotExist:
+            self.instance = CartItem.objects.create(cart_id=cart_id, **self.validated_data)
+
+        return self.instance
+
     class Meta:
         model = CartItem
         fields = ['id', 'product_id', 'quantity']
